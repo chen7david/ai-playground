@@ -1,6 +1,7 @@
 import { injectable, inject } from "inversify";
 import { ConfigService } from "./config.service";
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenAI, Type } from "@google/genai";
+import { WORDLIST_PROMPT } from "../prompts/wordlist.prompt";
 
 @injectable()
 export class GeminiService {
@@ -22,5 +23,34 @@ export class GeminiService {
       contents: prompt,
     });
     return response;
+  }
+
+  async getWordlist(context: string, wordlist: string[]) {
+    const userPrompt = `
+  Context: """${context}"""
+  Wordlist: ${JSON.stringify(wordlist)}
+  `;
+
+    const response = await this.ai.models.generateContent({
+      model: this.model,
+      contents: [
+        { role: "model", parts: [{ text: WORDLIST_PROMPT }] },
+        { role: "user", parts: [{ text: userPrompt }] },
+      ],
+    });
+
+    let result: any[] = [];
+    try {
+      const rawText = response.text ?? "";
+      const sanitizedText = rawText
+        .replaceAll("```json", "")
+        .replaceAll("```", "");
+      result = JSON.parse(sanitizedText);
+    } catch (e) {
+      console.log(e);
+      throw new Error("Model did not return valid JSON.");
+    }
+
+    return result;
   }
 }

@@ -15,6 +15,13 @@ container.bind(GeminiService).toSelf();
 const geminiService = container.get(GeminiService);
 
 const prompt = "What is the capital of France?";
+
+const wordlist = ["plants", "flowers", "water", "China"];
+const context =
+  "Plants are green and flowers are red. Water is wet. China is a country. The boy waters the plants.";
 const result = geminiService
-  .prompt(prompt)
-  .then((res) => console.log(res.text));
+  .getWordlist(context, wordlist)
+  .then((res) => console.log(res));
+// const result = geminiService
+//   .prompt(prompt)
+//   .then((res) => console.log(res.text));
