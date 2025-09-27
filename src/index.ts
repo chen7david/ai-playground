@@ -12,13 +12,9 @@ container.bind(ConfigService).toSelf();
 container.bind(GeminiService).toSelf();
 
 // Get the services
-const configService = container.get(ConfigService);
 const geminiService = container.get(GeminiService);
 
 const prompt = "What is the capital of France?";
 const result = geminiService
   .prompt(prompt)
   .then((res) => console.log(res.text));
-
-console.log(configService.getConfig("GEMINI_API_KEY"));
-console.log(configService.getConfig("GEMINI_MODEL"));
