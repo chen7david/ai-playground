@@ -1,7 +1,9 @@
 import { injectable, inject } from "inversify";
 import { ConfigService } from "./config.service";
-import { GoogleGenAI, Type } from "@google/genai";
-import { WORDLIST_PROMPT } from "../prompts/wordlist.prompt";
+import { GoogleGenAI } from "@google/genai";
+import { getFormattedWordlistPrompt } from "../prompts/wordlist/wordlist.prompt.format";
+import { WORDLIST_PROMPT_INSTRUCTIONS } from "../prompts/wordlist/wordlist.prompt.instructions";
+import { wordListSchema } from "../prompts/wordlist/wordlist.prompt.schema";
 
 @injectable()
 export class GeminiService {
@@ -26,25 +28,24 @@ export class GeminiService {
   }
 
   async getWordlist(context: string, wordlist: string[]) {
-    const userPrompt = `
-  Context: """${context}"""
-  Wordlist: ${JSON.stringify(wordlist)}
-  `;
+    const userPrompt = getFormattedWordlistPrompt(context, wordlist);
 
     const response = await this.ai.models.generateContent({
       model: this.model,
       contents: [
-        { role: "model", parts: [{ text: WORDLIST_PROMPT }] },
+        { role: "model", parts: [{ text: WORDLIST_PROMPT_INSTRUCTIONS }] },
         { role: "user", parts: [{ text: userPrompt }] },
       ],
+      config: {
+        responseMimeType: "application/json",
+        responseJsonSchema: wordListSchema,
+      },
     });
 
     let result: any[] = [];
     try {
       const rawText = response.text ?? "";
-      const sanitizedText = rawText
-        .replaceAll("```json", "")
-        .replaceAll("```", "");
+      const sanitizedText = rawText;
       result = JSON.parse(sanitizedText);
     } catch (e) {
       console.log(e);
