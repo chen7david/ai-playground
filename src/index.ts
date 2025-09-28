@@ -16,11 +16,19 @@ const geminiService = container.get(GeminiService);
 
 const prompt = "What is the capital of France?";
 
-const wordlist = ["plants", "flowers", "water", "China"];
+const wordlist = [
+  "plants",
+  "flowers",
+  "water",
+  "China",
+  "colour",
+  "prestigigotation",
+];
 const context =
   "Plants are green and flowers are red. Water is wet. China is a country. The boy waters the plants.";
 const result = geminiService
-  .getWordlist(context, wordlist)
+  .spellCheck(wordlist)
+  // .getWordlist(context, wordlist)
   .then((res) => console.log(res));
 // const result = geminiService
 //   .prompt(prompt)
