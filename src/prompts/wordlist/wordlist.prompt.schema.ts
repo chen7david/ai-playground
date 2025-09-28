@@ -21,6 +21,16 @@ export const wordListSchema = {
         description: "Simple definition of the word",
         nullable: false,
       },
+      pos: {
+        type: Type.STRING,
+        description: "Part of speech for the word (e.g. noun, verb, adjective)",
+        nullable: false,
+      },
+      phonetic: {
+        type: Type.STRING,
+        description: "Phonetic transcription of the word",
+        nullable: false,
+      },
       examples: {
         type: Type.ARRAY,
         description: "Example sentences using the word",
@@ -31,6 +41,6 @@ export const wordListSchema = {
         },
       },
     },
-    required: ["en", "zh", "definition", "examples"],
+    required: ["en", "zh", "definition", "pos", "phonetic", "examples"],
   },
 };
