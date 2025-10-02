@@ -9,7 +9,7 @@ import { SPELLCHECK_PROMPT_INSTRUCTIONS } from "../prompts/spellcheck/spellcheck
 import { spellCheckSchema } from "../prompts/spellcheck/spellcheck.prompt.schema";
 
 @injectable()
-export class GeminiService {
+export class AnkiSubService {
   private apiKey: string;
   private model: string;
   private ai: GoogleGenAI;
@@ -22,15 +22,7 @@ export class GeminiService {
     });
   }
 
-  async prompt(prompt: string) {
-    const response = await this.ai.models.generateContent({
-      model: this.model,
-      contents: prompt,
-    });
-    return response;
-  }
-
-  async getWordlist(context: string, wordlist: string[]) {
+  async subtitleToTranslatedCSV(context: string, wordlist: string[]) {
     const response = await this.ai.models.generateContent({
       model: this.model,
       config: {
@@ -42,33 +34,6 @@ export class GeminiService {
         {
           role: "user",
           parts: [{ text: getFormattedWordlistPrompt(context, wordlist) }],
-        },
-      ],
-    });
-
-    let result: any[] = [];
-    try {
-      const rawText = response.text ?? "";
-      result = JSON.parse(rawText);
-    } catch (e) {
-      throw new Error("Model did not return valid JSON.");
-    }
-
-    return result;
-  }
-
-  async spellCheck(wordlist: string[]) {
-    const response = await this.ai.models.generateContent({
-      model: this.model,
-      config: {
-        responseMimeType: "application/json",
-        responseJsonSchema: spellCheckSchema,
-      },
-      contents: [
-        { role: "model", parts: [{ text: SPELLCHECK_PROMPT_INSTRUCTIONS }] },
-        {
-          role: "user",
-          parts: [{ text: getFormattedSpellCheckWordlistPrompt(wordlist) }],
         },
       ],
     });
